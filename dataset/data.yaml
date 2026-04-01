@@ -1,0 +1,13 @@
+train: dataset/train/images
+val: dataset/valid/images
+test: dataset/test/images
+
+nc: 1
+names: ['baseball']
+
+roboflow:
+  workspace: eagle-eye
+  project: baseball-i5l4o
+  version: 7
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/eagle-eye/baseball-i5l4o/dataset/7
