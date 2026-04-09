@@ -2,26 +2,22 @@ import cv2
 from ultralytics import YOLO
 import torch
 
-if torch.cuda.is_available():
-    print(f"GPU: {torch.cuda.get_device_name(0)}")
-    device = 0
-else:
-    print("No GPU available, using CPU")
-    device = 'cpu'
+print(f"GPU: {torch.cuda.get_device_name(0)}")
 
-model = YOLO("yolov8n.pt")  
+# Usa tu modelo entrenado
+model = YOLO("runs/detect/runs/baseball_detector/weights/best.pt")
 
-cap = cv2.VideoCapture(0)   
+cap = cv2.VideoCapture(0)
 
 while True:
     ret, frame = cap.read()
     if not ret:
         break
 
-    results = model(frame, device=device)  
+    results = model(frame, device=0, conf=0.5)
     annotated = results[0].plot()
 
-    cv2.imshow("Baseball Tracker - Test", annotated)
+    cv2.imshow("Baseball Tracker", annotated)
 
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
