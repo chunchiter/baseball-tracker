@@ -1,0 +1,24 @@
+# Visión computacional
+opencv-python>=4.8.0
+ultralytics>=8.4.0
+
+# Deep Learning
+torch>=2.5.0
+torchvision>=0.20.0
+torchaudio>=2.5.0
+
+# Análisis y cálculo
+numpy>=2.4.0
+scipy>=1.17.0
+
+# Backend API
+fastapi>=0.135.0
+uvicorn[standard]>=0.42.0
+websockets>=16.0
+python-multipart>=0.0.22
+
+# Visualización
+matplotlib>=3.10.0
+
+# Utilidades
+python-dotenv>=1.2.2
