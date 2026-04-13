@@ -113,7 +113,7 @@ baseball-tracker/
 - [x] Guardado de sesiones en JSON
 - [x] Backend API con FastAPI + WebSocket
 - [x] Dashboard web con React + cámara en vivo
-- [ ] Trayectoria visual en el dashboard
+- [x] Trayectoria visual en el dashboard
 - [ ] Historial de lanzamientos en el dashboard
 - [ ] Zona de strike interactiva
 - [ ] Calibración automática de cámara

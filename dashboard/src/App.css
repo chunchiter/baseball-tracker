@@ -75,3 +75,15 @@ main { display: grid; gap: 20px; }
 .last-throw { background: #111; border-radius: 12px; padding: 16px; }
 
 .throw-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+.feeds {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.feed-box {
+  background: #111;
+  border-radius: 12px;
+  padding: 16px;
+}
