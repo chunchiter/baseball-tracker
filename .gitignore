@@ -2,3 +2,9 @@ venv/
 __pycache__/
 *.pyc
 .env
+dashboard/node_modules/
+dashboard/dist/
+runs/
+dataset/
+*.pt
+trajectories/
