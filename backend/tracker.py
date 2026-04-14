@@ -136,7 +136,8 @@ class BaseballTracker:
             "speed_kmh": self.current_speed_kmh,
             "max_speed_kmh": max(self.throw_max_speeds) if self.throw_max_speeds else 0,
             "total_throws": len(self.session_data["throws"]),
-            "trail": [list(p) if p else None for p in self.trail]
+            "trail": [list(p) if p else None for p in self.trail],
+            "throws": self.session_data["throws"]
         })
 
         return frame, self.current_state
