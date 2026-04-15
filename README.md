@@ -114,8 +114,8 @@ baseball-tracker/
 - [x] Backend API con FastAPI + WebSocket
 - [x] Dashboard web con React + cámara en vivo
 - [x] Trayectoria visual en el dashboard
-- [ ] Historial de lanzamientos en el dashboard
-- [ ] Zona de strike interactiva
+- [x] Historial de lanzamientos en el dashboard
+- [x] Zona de strike interactiva
 - [ ] Calibración automática de cámara
 - [ ] Overlay para OBS
 

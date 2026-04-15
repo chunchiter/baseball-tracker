@@ -149,6 +149,136 @@ function ThrowDetail({ throw: t, index }) {
   )
 }
 
+function StrikeZone({ throws }) {
+  const canvasRef = useRef(null)
+
+  // Zona de strike estándar MLB en píxeles
+  const ZONE = {
+    x: 80, y: 60,
+    width: 200, height: 280
+  }
+  const W = 360
+  const H = 420
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+
+    ctx.clearRect(0, 0, W, H)
+    ctx.fillStyle = '#0a0a0a'
+    ctx.fillRect(0, 0, W, H)
+
+    // Grid interior de la zona (9 secciones como MLB)
+    const cols = 3
+    const rows = 3
+    const cellW = ZONE.width / cols
+    const cellH = ZONE.height / rows
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        ctx.strokeStyle = '#222'
+        ctx.lineWidth = 1
+        ctx.strokeRect(
+          ZONE.x + c * cellW,
+          ZONE.y + r * cellH,
+          cellW, cellH
+        )
+      }
+    }
+
+    // Borde principal de la zona
+    ctx.strokeStyle = '#ffffff'
+    ctx.lineWidth = 2
+    ctx.strokeRect(ZONE.x, ZONE.y, ZONE.width, ZONE.height)
+
+    // Home plate
+    const plateX = ZONE.x + ZONE.width / 2
+    const plateY = ZONE.y + ZONE.height + 50
+    ctx.beginPath()
+    ctx.moveTo(plateX - 30, plateY)
+    ctx.lineTo(plateX + 30, plateY)
+    ctx.lineTo(plateX + 30, plateY + 20)
+    ctx.lineTo(plateX, plateY + 40)
+    ctx.lineTo(plateX - 30, plateY + 20)
+    ctx.closePath()
+    ctx.fillStyle = '#ffffff'
+    ctx.fill()
+
+    // Labels
+    ctx.fillStyle = '#555'
+    ctx.font = '11px sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText('ZONA DE STRIKE', ZONE.x + ZONE.width / 2, ZONE.y - 15)
+    ctx.fillText('Exterior', ZONE.x + ZONE.width + 30, ZONE.y + ZONE.height / 2)
+    ctx.fillText('Interior', ZONE.x - 30, ZONE.y + ZONE.height / 2)
+    ctx.fillText('Alto', ZONE.x - 30, ZONE.y + 15)
+    ctx.fillText('Bajo', ZONE.x - 30, ZONE.y + ZONE.height - 5)
+
+    // Dibujar puntos de cada lanzamiento
+    if (!throws || throws.length === 0) return
+
+    throws.forEach((t, idx) => {
+      if (!t.points || t.points.length === 0) return
+
+      // Normalizar el punto final al espacio de la zona de strike
+      const points = t.points
+      const lastPoint = points[points.length - 1]
+
+      // Mapear coordenadas de cámara (640x480) a zona de strike
+      const nx = (lastPoint[0] / 640) * ZONE.width + ZONE.x
+      const ny = (lastPoint[1] / 480) * ZONE.height + ZONE.y
+
+      // Color según velocidad
+      const speed = t.max_speed_kmh
+      let color = '#00ff88'
+      if (speed > 50) color = '#ff4444'
+      else if (speed > 20) color = '#ffaa00'
+
+      // Punto del lanzamiento
+      ctx.beginPath()
+      ctx.arc(nx, ny, 8, 0, Math.PI * 2)
+      ctx.fillStyle = color
+      ctx.globalAlpha = 0.8
+      ctx.fill()
+      ctx.globalAlpha = 1
+
+      // Número del lanzamiento
+      ctx.fillStyle = '#000'
+      ctx.font = 'bold 9px sans-serif'
+      ctx.textAlign = 'center'
+      ctx.fillText(idx + 1, nx, ny + 3)
+    })
+
+    // Leyenda
+    ctx.font = '11px sans-serif'
+    ctx.textAlign = 'left'
+    const legends = [
+      { color: '#ff4444', label: '> 50 km/h' },
+      { color: '#ffaa00', label: '20-50 km/h' },
+      { color: '#00ff88', label: '< 20 km/h' }
+    ]
+    legends.forEach((l, i) => {
+      ctx.fillStyle = l.color
+      ctx.beginPath()
+      ctx.arc(10, H - 60 + i * 18, 5, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.fillStyle = '#888'
+      ctx.fillText(l.label, 22, H - 56 + i * 18)
+    })
+
+  }, [throws])
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={W}
+      height={H}
+      style={{ width: '100%', maxWidth: '360px', borderRadius: '8px' }}
+    />
+  )
+}
+
 function App() {
   const [connected, setConnected] = useState(false)
   const [state, setState] = useState({
@@ -236,6 +366,37 @@ function App() {
             <span className="stat-value">{state.total_throws}</span>
           </div>
         </section>
+
+      {/* Zona de strike */}
+      {throws.length > 0 && (
+        <section className="strike-section">
+          <h2>Zona de strike</h2>
+          <div className="strike-layout">
+            <StrikeZone throws={throws} />
+            <div className="strike-info">
+              <p>Cada punto representa el último frame detectado del lanzamiento.</p>
+              <div className="strike-summary">
+                <div className="stat-card">
+                  <span className="stat-label">Total lanzamientos</span>
+                  <span className="stat-value">{throws.length}</span>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-label">Velocidad max sesion</span>
+                  <span className="stat-value speed">
+                    {Math.max(...throws.map(t => t.max_speed_kmh))} km/h
+                  </span>
+                </div>
+                <div className="stat-card">
+                  <span className="stat-label">Promedio sesion</span>
+                  <span className="stat-value">
+                    {Math.round(throws.reduce((a, t) => a + t.avg_speed_kmh, 0) / throws.length)} km/h
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
         {/* Grafica velocidad */}
         <section className="chart-section">
